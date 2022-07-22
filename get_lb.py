@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from urllib import response
 import requests
 import json
 from auth import auth
@@ -67,8 +66,16 @@ def get_svc_grp_binding(svc_grp):
                 ip = member["ip"]
                 port = member["port"]
                 state = member["svrstate"]
-                
+                stats(name, ip, port)
                 print(name, ip, port, state)
+            
+
+
+def stats(svr_grp, ip, port):
+    
+    url = f"http://192.168.203.101/nitro/v1/stat/servicegroupmember/{svr_grp}?args=ip:{ip},port:{port}"
+    response = requests.get(url, headers=headers)
+    print(response.text)
     
 if __name__ == '__main__': 
     main()
