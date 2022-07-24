@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+
 import requests
 import json
 
 
 def auth(adc, uname, passwd):
-    url = f"{adc}/login"
+    url = "{}/login".format(adc)
 
     payload = json.dumps({
     "login": {
@@ -16,6 +18,7 @@ def auth(adc, uname, passwd):
     }
     requests.packages.urllib3.disable_warnings()
     response = requests.post(url, headers=headers, data=payload, verify=False)
-    res_json = json.loads(response.text)
-    token = res_json['sessionid']
-    return token
+    if response.ok:
+        res_json = json.loads(response.text)
+        token = res_json['sessionid']
+        return token
