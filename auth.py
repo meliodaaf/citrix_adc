@@ -16,9 +16,10 @@ def auth(adc, uname, passwd):
     headers = {
     'Content-Type': 'application/json'
     }
-    requests.packages.urllib3.disable_warnings()
-    response = requests.post(url, headers=headers, data=payload, verify=False)
+    response = requests.post(url, headers=headers, data=payload)
     if response.ok:
         res_json = json.loads(response.text)
         token = res_json['sessionid']
         return token
+    else:
+        print("[*] Error occured: {}".format(json.loads(response.text)["message"]))
