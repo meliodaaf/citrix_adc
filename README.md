@@ -68,7 +68,7 @@ Note: when -v/--vserver is ommited, the script will get all lb vservers.
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `targe lb`      | `string` | Citrix ADC to be communicated |
+| `target lb`      | `string` | Citrix ADC to be communicated |
 | `resource` | string| resource to be retrieved|
 
 
