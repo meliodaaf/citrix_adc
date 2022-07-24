@@ -9,7 +9,7 @@ from auth import auth
 
 
 parser = argparse.ArgumentParser(description="A tool that will generate all lb vservers and check its backend servers' status.")
-parser.add_argument('-h', '--host', required=True, help='Target LB Vserver')
+parser.add_argument('-t', '--target', required=True, help='Target LB Vserver')
 parser.add_argument('-u', '--username', required=True, help="Username for logging in")
 args = parser.parse_args()
 
