@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from email.mime import base
+from urllib import response
 import requests
 import json
 import sys
@@ -22,14 +24,17 @@ session = requests.Session()
 base_path = "http://{}/nitro/v1".format(host)
 
 def main():
-    
+    # Main function to execute script
+    print("\n[*] Connecting to {}".format(base_path))
     try:
         token = auth("{}/config".format(base_path), uname, passwd)
         headers = {
-            'Content-Type': 'application/json',
-            'Cookie': 'NITRO_AUTH_TOKEN={}'.format(token)
+            "Content-Type": "application/json",
+            "Cookie": "NITRO_AUTH_TOKEN={}".format(token)
             }  
         session.headers.update(headers)
+        check_ha_node()
+        get_route()
         if vserver:
             get_lb(vserver)
         else:
@@ -39,6 +44,38 @@ def main():
         sys.exit()
 
 
+def get_route():
+    url = "{}/config/route".format(base_path)
+    response = session.get(url)
+    if response.ok:
+        print("\n[*] Route Information: ")
+        data = json.loads(response.text)
+        route = data["route"]
+        for net in route:
+            network = net["network"]
+            netmask = net["netmask"]
+            gw = net["gateway"]
+            type = net["routetype"]
+            print("\nNetwork: {}".format(network))
+            print("Netmask: {}".format(netmask))
+            print("Gateway: {}".format(gw))
+            print("Route Type: {}".format(type))
+
+def check_ha_node():
+    url = "{}/config/hanode".format(base_path)
+    response = session.get(url)
+    if response.ok:
+        print("\n[*] HA Nodes Information: ")
+        data = json.loads(response.text)
+        hanode = data["hanode"]
+        for ha in hanode:
+            ip = ha["ipaddress"]
+            state = ha["state"]
+            status = ha["hastatus"]
+            print("\nIP Address: {}".format(ip))
+            print("State: {}".format(state))
+            print("Status: {}".format(status))
+    
 
 def get_lb(vserver):
     url = "{}/config/lbvserver/{}".format(base_path, vserver)
