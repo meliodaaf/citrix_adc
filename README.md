@@ -58,7 +58,7 @@ Note: when -v/--vserver is ommited, the script will get all lb vservers.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `Username` | `string` | Username |
-| `Passord`| `string`| Password/OTP|
+| `Password`| `string`| Password/OTP|
 
 #### Get item
 
