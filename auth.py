@@ -18,6 +18,7 @@ def auth(adc, uname, passwd):
     }
     response = requests.post(url, headers=headers, data=payload)
     if response.ok:
+        print("[*] Connection successful!")
         res_json = json.loads(response.text)
         token = res_json['sessionid']
         return token
