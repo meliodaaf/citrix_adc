@@ -7,21 +7,22 @@ import argparse
 import getpass
 from auth import auth
 
-
 parser = argparse.ArgumentParser(description="A tool that will generate all lb vservers and check its backend servers' status.")
-parser.add_argument('-t', '--target', required=True, help='Target LB Vserver')
-parser.add_argument('-u', '--username', required=True, help="Username for logging in")
+parser.add_argument("-t", "--target", required=True, help="Target LB Vserver", metavar="")
+parser.add_argument("-u", "--username", required=True, help="Username for logging in.", metavar="")
+parser.add_argument("-v", "--vserver", help="Check specific LB Vserver", metavar="")
 args = parser.parse_args()
 
 host = args.target
 uname = args.username
 passwd = getpass.getpass("Password: ")
+vserver = args.vserver
 
 session = requests.Session()
-base_path = "https://{}/nitro/v1".format(host)
-
+base_path = "http://{}/nitro/v1".format(host)
 
 def main():
+    
     try:
         token = auth("{}/config".format(base_path), uname, passwd)
         headers = {
@@ -29,16 +30,39 @@ def main():
             'Cookie': 'NITRO_AUTH_TOKEN={}'.format(token)
             }  
         session.headers.update(headers)
-        get_all_lbs()
+        if vserver:
+            get_lb(vserver)
+        else:
+            get_all_lbs()
     except KeyboardInterrupt:
         print("[X] Quitting...")
         sys.exit()
-    except ConnectionError:
-        print("[X] Invalid password or username.")
-        sys.exit()
-    except:
-        print("[!] Error has occured, please make sure connectivity and credentials.")
-        sys.exit()
+
+
+
+def get_lb(vserver):
+    url = "{}/config/lbvserver/{}".format(base_path, vserver)
+    response = session.get(url)
+    if response.ok:
+        data = json.loads(response.text)
+        lb_vservers = data["lbvserver"]
+        for lb_vserver in lb_vservers:
+            name = lb_vserver["name"]
+            state = lb_vserver["curstate"]
+            ip = lb_vserver["ipv46"]
+            port = lb_vserver["port"]
+            lbmethod = lb_vserver["lbmethod"]
+            blbmethod = lb_vserver["backuplbmethod"]
+            persistence = lb_vserver["persistencetype"]
+            print("\n[*] LB Vserver {}:".format(name))
+            print("IP Address: {}".format(ip))
+            print("Port: {}".format(port))
+            print("State {}".format(state))
+            print("Configured Method: {}, BackupMethod: {}".format(lbmethod, blbmethod))
+            print("Persistence Type: {}".format(persistence))
+            stats("lbvserver", name)
+            get_serviceGroups(name)
+            get_service(name)
 
 
 def get_all_lbs():
@@ -49,7 +73,6 @@ def get_all_lbs():
     if response.ok:
         data = json.loads(response.text)
         lb_vservers = data["lbvserver"]
-        
         for lb_vserver in lb_vservers:
             name = lb_vserver["name"]
             state = lb_vserver["curstate"]
@@ -58,7 +81,7 @@ def get_all_lbs():
             lbmethod = lb_vserver["lbmethod"]
             blbmethod = lb_vserver["backuplbmethod"]
             persistence = lb_vserver["persistencetype"]
-            print("\n[*] Retrieving lb vserver bindings for {}: ".format(name))
+            print("\n[*] LB Vserver {}:".format(name))
             print("IP Address: {}".format(ip))
             print("Port: {}".format(port))
             print("State {}".format(state))
@@ -153,13 +176,9 @@ def stats(resource, object, ip=None, port=None):
         for member in members:
             t_req = member["totalrequests"]
             t_resp = member["totalresponses"]
-            req_rate = member["requestsrate"]
-            resp_rate = member["responsesrate"]
             current_svr_conn = member["cursrvrconnections"]
             print("Total Requests: {}".format(t_req))
             print("Total Response: {}".format(t_resp))
-            print("Requests rate: {}".format(req_rate))
-            print("Response rate: {}".format(resp_rate))
             print("Current server connections: {}".format(current_svr_conn))
         
         
