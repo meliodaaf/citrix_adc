@@ -42,7 +42,7 @@ Note: when -v/--vserver is ommited, the script will get all lb vservers.
 ./lbstats.py --username nsroot --target 192.168.203.101
 ```
 
-### Use case 3 - Retrieve a specific lb vserver
+### Use case 2 - Retrieve a specific lb vserver
 
 ```bash
 ./lbstats.py --username nsroot --target 192.168.203.101 --vserver lb_vs_server1
