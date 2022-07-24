@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from email.mime import base
-from urllib import response
+
 import requests
 import json
 import sys
@@ -21,7 +20,7 @@ passwd = getpass.getpass("Password: ")
 vserver = args.vserver
 
 session = requests.Session()
-base_path = "http://{}/nitro/v1".format(host)
+base_path = "https://{}/nitro/v1".format(host)
 
 def main():
     # Main function to execute script
