@@ -21,6 +21,7 @@ vserver = args.vserver
 
 session = requests.Session()
 base_path = "https://{}/nitro/v1".format(host)
+session.verify=False
 
 def main():
     # Main function to execute script
@@ -30,7 +31,7 @@ def main():
         headers = {
             "Content-Type": "application/json",
             "Cookie": "NITRO_AUTH_TOKEN={}".format(token)
-            }  
+            }
         session.headers.update(headers)
         check_ha_node()
         get_route()
@@ -74,7 +75,7 @@ def check_ha_node():
             print("\nIP Address: {}".format(ip))
             print("State: {}".format(state))
             print("Status: {}".format(status))
-    
+
 
 def get_lb(vserver):
     url = "{}/config/lbvserver/{}".format(base_path, vserver)
@@ -126,36 +127,36 @@ def get_all_lbs():
             stats("lbvserver", name)
             get_serviceGroups(name)
             get_service(name)
-            
-            
+
+
 def get_serviceGroups(lb):
     # Retrieve serviceGroups bound to an lb vserver.
     url = "{}/config/lbvserver_servicegroup_binding/{}".format(base_path, lb)
     response = session.get(url)
-    
+
     if response.ok:
         data = json.loads(response.text)
         try:
             svc_grps = data["lbvserver_servicegroup_binding"]
-            
+
             for svc_grp in svc_grps:
                 name = svc_grp["servicegroupname"]
                 print("\nService Group {}: ".format(name))
                 get_serviceGroupBindings(name)
         except KeyError:
             svc_grps = None
-            
+
 
 def get_service(lb):
     # Retrieve serviceGroups bound to an lb vserver.
     url = "{}/config/lbvserver_service_binding/{}".format(base_path, lb)
     response = session.get(url)
-    
+
     if response.ok:
         data = json.loads(response.text)
         try:
             services = data["lbvserver_service_binding"]
-            
+
             for service in services:
                 name = service["servicename"]
                 ip = service["ipv46"]
@@ -166,11 +167,11 @@ def get_service(lb):
                 print("Port: {}".format(port))
                 print("Current State: {}".format(cur_state))
                 stats("service", name)
-                
+
         except KeyError:
             service = None
-            
-            
+
+
 def get_serviceGroupBindings(svc_grp):
     # Retrieve the servers bound to a serviceGroup
     url = "{}/config/servicegroup_binding/{}".format(base_path, svc_grp)
@@ -178,7 +179,7 @@ def get_serviceGroupBindings(svc_grp):
     if response.ok:
         data = json.loads(response.text)
         svrs = data["servicegroup_binding"]
-        
+
         for svr in svrs:
             members = svr["servicegroup_servicegroupmember_binding"]
             for member in members:
@@ -192,7 +193,7 @@ def get_serviceGroupBindings(svc_grp):
                 print("Port: {}".format(port))
                 print("State: {}".format(state))
                 stats("servicegroupmember", name, servername, port)
-            
+
 
 
 def stats(resource, object, ip=None, port=None):
@@ -204,7 +205,7 @@ def stats(resource, object, ip=None, port=None):
     elif resource == "lbvserver":
         url = "{}/stat/{}/{}".format(base_path, resource, object)
 
-        
+
     response = session.get(url)
     if response.ok:
         data = json.loads(response.text)
@@ -216,7 +217,7 @@ def stats(resource, object, ip=None, port=None):
             print("Total Requests: {}".format(t_req))
             print("Total Response: {}".format(t_resp))
             print("Current server connections: {}".format(current_svr_conn))
-        
-        
-if __name__ == '__main__': 
+
+
+if __name__ == '__main__':
     main()
