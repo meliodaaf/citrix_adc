@@ -3,7 +3,9 @@
 
 This is a tool for retrieving stats for a load balancer vserver. It also gets all the vserver bound to it as well as their stats.
 
+## Version support
 
+python3.5+
 
 ## Usage/Examples
 
